@@ -24,7 +24,7 @@ if not os.path.isfile("aapl_hist_data.csv"):
 apple_stock_df = pd.read_csv("aapl_hist_data.csv")
 apple_stock_df = apple_stock_df.iloc[365:]
 
-
+# calculate fundamentals
 apple_stock_df["seven_day_rolling_avg"] = (
     apple_stock_df["close"].rolling(window=7).mean()
 )
@@ -32,13 +32,23 @@ apple_stock_df["thirty_day_rolling_avg"] = (
     apple_stock_df["close"].rolling(window=30).mean()
 )
 apple_stock_df["return"] = apple_stock_df["close"].pct_change()
+apple_stock_df["SMA"] = apple_stock_df["close"].rolling(window=5).mean()
+apple_stock_df["EMA"] = apple_stock_df["close"].ewm(span=5).mean()
+apple_stock_df["CMA"] = apple_stock_df["close"].expanding().mean()
 
-plt.plot(apple_stock_df["date"], apple_stock_df["close"])
-plt.plot(apple_stock_df["date"], fundamentals["seven_day_rolling_avg"])
-plt.plot(apple_stock_df["date"], fundamentals["thirty_day_rolling_avg"])
+apple_stock_df["lag1"] = apple_stock_df["close"].shift(1)
+
+plt.plot(apple_stock_df["date"], apple_stock_df["close"], label="Closing Price")
+# plt.plot(apple_stock_df["date"], apple_stock_df["seven_day_rolling_avg"])
+# plt.plot(apple_stock_df["date"], apple_stock_df["thirty_day_rolling_avg"])
+plt.plot(apple_stock_df["date"], apple_stock_df["SMA"], label="SMA")
+plt.plot(apple_stock_df["date"], apple_stock_df["EMA"], label="EMA")
+plt.plot(apple_stock_df["date"], apple_stock_df["CMA"], label="CMA")
+
 plt.xlabel("time")
 plt.ylabel("closing price")
 plt.title("aaple stock")
+plt.legend()
 plt.show()
 # aapl_data = yf.download(ticker, start='2020-01-01', end='2022-01-01')
 
