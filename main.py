@@ -25,16 +25,12 @@ apple_stock_df = pd.read_csv("aapl_hist_data.csv")
 apple_stock_df = apple_stock_df.iloc[365:]
 
 
-fundamentals = {
-    "seven_day_rolling_avg": apple_stock_df["close"].rolling(window=7).mean(),
-    "thirty_day_rolling_avg": apple_stock_df["close"].rolling(window=30).mean(),
-}
-# seven_day_rolling_avg = apple_stock_df['close'].rolling(window=7).mean()
-# thirty_day_rolling_avg = apple_stock_df['close'].rolling(window=30).mean()
-
-
-# print(apple_stock_df['close'].rolling(window=7).mean())
-
+apple_stock_df["seven_day_rolling_avg"] = (
+    apple_stock_df["close"].rolling(window=7).mean()
+)
+apple_stock_df["thirty_day_rolling_avg"] = (
+    apple_stock_df["close"].rolling(window=30).mean()
+)
 apple_stock_df["return"] = apple_stock_df["close"].pct_change()
 
 plt.plot(apple_stock_df["date"], apple_stock_df["close"])
@@ -44,8 +40,6 @@ plt.xlabel("time")
 plt.ylabel("closing price")
 plt.title("aaple stock")
 plt.show()
-
-
 # aapl_data = yf.download(ticker, start='2020-01-01', end='2022-01-01')
 
 # aapl_data.to_csv('aapl_data.csv')
