@@ -3,6 +3,10 @@ import pandas as pd
 from tiingo import TiingoClient
 import os
 from dotenv import load_dotenv
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression
+import seaborn
 
 """
 TODO - Create docker of sql to get data 
@@ -38,6 +42,12 @@ apple_stock_df["CMA"] = apple_stock_df["close"].expanding().mean()
 
 apple_stock_df["lag1"] = apple_stock_df["close"].shift(1)
 
+scaler = StandardScaler()
+features = ["SMA", "EMA", "CMA"]
+# apple_stock_df[features] = scaler.fit_transform(apple_stock_df[features])
+
+
+apple_stock_df = apple_stock_df.dropna()
 plt.plot(apple_stock_df["date"], apple_stock_df["close"], label="Closing Price")
 # plt.plot(apple_stock_df["date"], apple_stock_df["seven_day_rolling_avg"])
 # plt.plot(apple_stock_df["date"], apple_stock_df["thirty_day_rolling_avg"])
@@ -50,8 +60,20 @@ plt.ylabel("closing price")
 plt.title("aaple stock")
 plt.legend()
 plt.show()
-# aapl_data = yf.download(ticker, start='2020-01-01', end='2022-01-01')
 
-# aapl_data.to_csv('aapl_data.csv')
-# print(aapl_data.head())
-# print(aapl_data[('Adj Close', 'AAPL')])
+X = apple_stock_df[["CMA", "SMA", "EMA"]]
+y = apple_stock_df["close"]
+
+x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+linReg = LinearRegression()
+linReg.fit(x_train, y_train)
+
+# print(pd.DataFrame(linReg.coef_, X.columns, columns=["Coeff"]))
+predictions = linReg.predict(x_test)
+
+plt.scatter(y_test, predictions)
+plt.show()
+
+plt.hist(y_test - predictions)
+plt.show()
