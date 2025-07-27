@@ -11,9 +11,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
 import seaborn
 
-"""
-TODO - Create docker of sql to get data 
-"""
 load_dotenv()
 API_KEY = os.getenv("TIINGO_API_KEY")
 
@@ -22,7 +19,6 @@ config = {"api_key": API_KEY, "session": True}
 client = TiingoClient(config)
 ticker = "AAPL"
 
-
 if not os.path.isfile("aapl_hist_data.csv"):
     print("not executing")
     aapl_hist_data = client.get_dataframe(ticker, "2020-01-01")
@@ -30,9 +26,8 @@ if not os.path.isfile("aapl_hist_data.csv"):
     aapl_hist_data.to_csv("aapl_hist_data.csv", index=True)
 
 apple_stock_df = pd.read_csv("aapl_hist_data.csv")
-apple_stock_df = apple_stock_df.iloc[365:]
+apple_stock_df = apple_stock_df.iloc[365:]  # this is to remove the covid outlier data
 
-# calculate fundamentals
 apple_stock_df["seven_day_rolling_avg"] = (
     apple_stock_df["close"].rolling(window=7).mean()
 )
@@ -43,25 +38,17 @@ apple_stock_df["return"] = apple_stock_df["close"].pct_change()
 apple_stock_df["SMA"] = apple_stock_df["close"].rolling(window=5).mean()
 apple_stock_df["EMA"] = apple_stock_df["close"].ewm(span=5).mean()
 apple_stock_df["CMA"] = apple_stock_df["close"].expanding().mean()
-
 apple_stock_df["lag1"] = apple_stock_df["close"].shift(1)
-
 apple_stock_df["target"] = apple_stock_df["lag1"] > apple_stock_df["close"].astype(int)
-# rfc_features = ["open", "high", "low", "close", "volume"]
-
 
 features = ["SMA", "EMA", "CMA", "open", "high", "low", "close", "volume"]
-# apple_stock_df[features] = scaler.fit_transform(apple_stock_df[features])
-
 
 apple_stock_df = apple_stock_df.dropna()
+
 plt.plot(apple_stock_df["date"], apple_stock_df["close"], label="Closing Price")
-# plt.plot(apple_stock_df["date"], apple_stock_df["seven_day_rolling_avg"])
-# plt.plot(apple_stock_df["date"], apple_stock_df["thirty_day_rolling_avg"])
 plt.plot(apple_stock_df["date"], apple_stock_df["SMA"], label="SMA")
 plt.plot(apple_stock_df["date"], apple_stock_df["EMA"], label="EMA")
 plt.plot(apple_stock_df["date"], apple_stock_df["CMA"], label="CMA")
-
 plt.xlabel("time")
 plt.ylabel("closing price")
 plt.title("aaple stock")
@@ -74,12 +61,10 @@ y = apple_stock_df["close"]
 x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
 # linear regression
-linReg = LinearRegression()
+linReg = LinearRegression(fit_intercept=True)
 linReg.fit(x_train, y_train)
 print(linReg.score(X, y))  # 0.995254691136916
 
-
-# print(pd.DataFrame(linReg.coef_, X.columns, columns=["Coeff"]))
 predictions = linReg.predict(x_test)
 
 plt.scatter(y_test, predictions)
