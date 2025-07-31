@@ -25,7 +25,7 @@ if not os.path.isfile("sp500.csv"):
     aapl_hist_data.index = pd.to_datetime(aapl_hist_data.index).tz_localize(None)
     aapl_hist_data.to_csv("s&p500_data.csv", index=True)
 
-sp500_df = pd.read_csv("sp500.csv")
+sp500_df = pd.read_csv("sp500.csv", index_col=0)
 
 sp500_df["seven_day_rolling_avg"] = sp500_df["Close"].rolling(window=7).mean()
 sp500_df["thirty_day_rolling_avg"] = sp500_df["Close"].rolling(window=30).mean()
@@ -101,7 +101,9 @@ predictors = ["Close", "Volume", "Open", "High", "Low"]
 
 def predict(train, test, predictors, model):
     model.fit(train[predictors], train["Target"])
-    preds = model.predict(test[predictors])
+    preds = model.predict_proba(test[predictors])[:, 1]
+    preds[preds >= 0.6] = 1
+    preds[preds < 0.6] = 0
     preds = pd.Series(preds, index=test.index, name="Predictions")
     combined = pd.concat([test["Target"], preds], axis=1)
     return combined
@@ -119,7 +121,29 @@ def backtest(data, model, predictors, start=2500, step=250):
     return pd.concat(all_predictions)
 
 
-predictions = backtest(sp500_df, randForClf, predictors)
+# predictions = backtest(sp500_df, randForClf, predictors)
+# print(predictions["Predictions"].value_counts())
+# print(metrics.precision_score(predictions["Target"], predictions["Predictions"]))
+# print(predictions["Target"].value_counts() / predictions.shape[0])
+
+
+horizons = [2, 5, 60, 250, 1000]
+new_predictors = []
+
+for horizon in horizons:
+    rolling_avgs = sp500_df.rolling(horizon).mean()
+
+    ratio_column = f"Close_Ratio_{horizon}"
+    sp500_df[ratio_column] = sp500_df["Close"] / rolling_avgs["Close"]
+    trend_column = f"Trend_Column_{horizon}"
+    sp500_df[trend_column] = sp500_df.shift(1).rolling(horizon).sum()["Target"]
+
+    new_predictors += [ratio_column, trend_column]
+
+sp500_df = sp500_df.dropna()
+print(sp500_df)
+model = RandomForestClassifier(n_estimators=200, min_samples_split=50, random_state=1)
+
+predictions = backtest(sp500_df, model, new_predictors)
 print(predictions["Predictions"].value_counts())
 print(metrics.precision_score(predictions["Target"], predictions["Predictions"]))
-print(predictions["Target"].value_counts() / predictions.shape[0])

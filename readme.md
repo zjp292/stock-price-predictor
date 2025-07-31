@@ -10,3 +10,5 @@ This is a practice project to learn and understand core concepts of AI/ML.
 The data used in this project was gotten from the Tiingo API. More details can be found at this link: https://www.tiingo.com/. I used historical stock price data starting from **January 1st, 2020** until **July 26th, 2025**. To avoid rate limits, I saved this data as a CSV. 
 
 ![Stock data visualized in a line graph](Stock_png1.png)
+
+https://www.youtube.com/watch?v=1O_BenficgE 
