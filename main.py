@@ -5,11 +5,17 @@ from tiingo import TiingoClient
 import os
 from dotenv import load_dotenv
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
+import tensorflow as tf
+from keras.src.layers import LSTM
+from keras.src.layers import Dense
+from keras.src.models import sequential
 import seaborn
+
+
 
 load_dotenv()
 API_KEY = os.getenv("TIINGO_API_KEY")
@@ -25,7 +31,9 @@ if not os.path.isfile("sp500.csv"):
     aapl_hist_data.index = pd.to_datetime(aapl_hist_data.index).tz_localize(None)
     aapl_hist_data.to_csv("s&p500_data.csv", index=True)
 
-sp500_df = pd.read_csv("sp500.csv", index_col=0)
+sp500 = pd.read_csv("sp500.csv", index_col=0)
+
+sp500_df = sp500
 
 sp500_df["seven_day_rolling_avg"] = sp500_df["Close"].rolling(window=7).mean()
 sp500_df["thirty_day_rolling_avg"] = sp500_df["Close"].rolling(window=30).mean()
@@ -64,11 +72,11 @@ print(linReg.score(X, y))  # 0.995254691136916
 
 predictions = linReg.predict(x_test)
 
-plt.scatter(y_test, predictions)
-plt.show()
+# plt.scatter(y_test, predictions)
+# plt.show()
 
-plt.hist(y_test - predictions)
-plt.show()
+# plt.hist(y_test - predictions)
+# plt.show()
 
 print(metrics.mean_absolute_error(y_test, predictions))  # 1.5091531233628197
 print(metrics.mean_squared_error(y_test, predictions))  # 3.4416421437571643
@@ -123,10 +131,30 @@ for horizon in horizons:
 
     new_predictors += [ratio_column, trend_column]
 
-sp500_df = sp500_df.dropna()
-print(sp500_df)
-model = RandomForestClassifier(n_estimators=200, min_samples_split=50, random_state=1)
+# sp500_df = sp500_df.dropna()
+# print(sp500_df)
+# model = RandomForestClassifier(n_estimators=200, min_samples_split=50, random_state=1)
 
-predictions = backtest(sp500_df, model, new_predictors)
-print(predictions["Predictions"].value_counts())
-print(metrics.precision_score(predictions["Target"], predictions["Predictions"]))
+# predictions = backtest(sp500_df, model, new_predictors)
+# print(predictions["Predictions"].value_counts())
+# print(metrics.precision_score(predictions["Target"], predictions["Predictions"]))
+
+
+
+'''
+LTSM Model
+'''
+data_frame = pd.read_csv('sp500.csv', index_col=0)
+
+df = data_frame.filter(['Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume'])
+
+scaler = MinMaxScaler()
+
+
+scaled_data = scaler.fit_transform(df)
+
+dataFrame = pd.DataFrame(data=scaled_data, index=data_frame.index, columns=df.columns)
+print(dataFrame)
+
+close_data = dataFrame.filter(['Close'])
+close_dataset = close_data.values()
