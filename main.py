@@ -5,14 +5,9 @@ from tiingo import TiingoClient
 import os
 from dotenv import load_dotenv
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
-import tensorflow as tf
-from keras.src.layers import LSTM
-from keras.src.layers import Dense
-from keras.src.models import sequential
 import seaborn
 
 
@@ -50,15 +45,16 @@ print(sp500_df)
 
 sp500_df = sp500_df.dropna()
 
-# plt.plot(sp500_df["date"], sp500_df["close"], label="Closing Price")
-# plt.plot(sp500_df["date"], sp500_df["SMA"], label="SMA")
-# plt.plot(sp500_df["date"], sp500_df["EMA"], label="EMA")
-# plt.plot(sp500_df["date"], sp500_df["CMA"], label="CMA")
-# plt.xlabel("time")
-# plt.ylabel("closing price")
-# plt.title("aaple stock")
-# plt.legend()
-# plt.show()
+print(sp500_df.columns)
+plt.plot(sp500_df.index, sp500_df["Close"], label="Closing Price")
+plt.plot(sp500_df.index, sp500_df["SMA"], label="SMA")
+plt.plot(sp500_df.index, sp500_df["EMA"], label="EMA")
+plt.plot(sp500_df.index, sp500_df["CMA"], label="CMA")
+plt.xlabel("time")
+plt.ylabel("closing price")
+plt.title("aaple stock")
+plt.legend()
+plt.show()
 
 X = sp500_df[["CMA", "SMA", "EMA"]]
 y = sp500_df["Close"]
@@ -72,11 +68,11 @@ print(linReg.score(X, y))  # 0.995254691136916
 
 predictions = linReg.predict(x_test)
 
-# plt.scatter(y_test, predictions)
-# plt.show()
+plt.scatter(y_test, predictions)
+plt.show()
 
-# plt.hist(y_test - predictions)
-# plt.show()
+plt.hist(y_test - predictions)
+plt.show()
 
 print(metrics.mean_absolute_error(y_test, predictions))  # 1.5091531233628197
 print(metrics.mean_squared_error(y_test, predictions))  # 3.4416421437571643
@@ -112,10 +108,10 @@ def backtest(data, model, predictors, start=2500, step=250):
     return pd.concat(all_predictions)
 
 
-# predictions = backtest(sp500_df, randForClf, predictors)
-# print(predictions["Predictions"].value_counts())
-# print(metrics.precision_score(predictions["Target"], predictions["Predictions"]))
-# print(predictions["Target"].value_counts() / predictions.shape[0])
+predictions = backtest(sp500_df, randForClf, predictors)
+print(predictions["Predictions"].value_counts())
+print(metrics.precision_score(predictions["Target"], predictions["Predictions"]))
+print(predictions["Target"].value_counts() / predictions.shape[0])
 
 
 horizons = [2, 5, 60, 250, 1000]
@@ -131,30 +127,13 @@ for horizon in horizons:
 
     new_predictors += [ratio_column, trend_column]
 
-# sp500_df = sp500_df.dropna()
-# print(sp500_df)
-# model = RandomForestClassifier(n_estimators=200, min_samples_split=50, random_state=1)
+sp500_df = sp500_df.dropna()
+print(sp500_df)
+model = RandomForestClassifier(n_estimators=200, min_samples_split=50, random_state=1)
 
-# predictions = backtest(sp500_df, model, new_predictors)
-# print(predictions["Predictions"].value_counts())
-# print(metrics.precision_score(predictions["Target"], predictions["Predictions"]))
-
-
-
-'''
-LTSM Model
-'''
-data_frame = pd.read_csv('sp500.csv', index_col=0)
-
-df = data_frame.filter(['Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume'])
-
-scaler = MinMaxScaler()
+predictions = backtest(sp500_df, model, new_predictors)
+print(predictions["Predictions"].value_counts())
+print(metrics.precision_score(predictions["Target"], predictions["Predictions"]))
 
 
-scaled_data = scaler.fit_transform(df)
 
-dataFrame = pd.DataFrame(data=scaled_data, index=data_frame.index, columns=df.columns)
-print(dataFrame)
-
-close_data = dataFrame.filter(['Close'])
-close_dataset = close_data.values()
