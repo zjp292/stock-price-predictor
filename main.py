@@ -8,8 +8,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
-import seaborn
-
 
 
 load_dotenv()
@@ -18,7 +16,7 @@ API_KEY = os.getenv("TIINGO_API_KEY")
 config = {"api_key": API_KEY, "session": True}
 
 client = TiingoClient(config)
-ticker = "VOO"
+ticker = "" # enter ticker symbol here
 
 if not os.path.isfile("sp500.csv"):
     print("not executing")
@@ -52,7 +50,7 @@ plt.plot(sp500_df.index, sp500_df["EMA"], label="EMA")
 plt.plot(sp500_df.index, sp500_df["CMA"], label="CMA")
 plt.xlabel("time")
 plt.ylabel("closing price")
-plt.title("aaple stock")
+plt.title("S&P 500 Historical Data")
 plt.legend()
 plt.show()
 
