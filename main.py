@@ -1,4 +1,5 @@
 from models.data_processing import DataProcessing
+from utils import graphing
 
 # get stock data (either csv or ticker)
 
@@ -9,7 +10,21 @@ from models.data_processing import DataProcessing
 # show random forest for free
 # LSTM for paid
 
+
 data_processor = DataProcessing("MSFT")
-data = data_processor.fetch_data()
-print(data.head())
+print(data_processor.data.head())
 # data_processor.process_data()
+
+list_of_columns = [
+    "close",
+    "SMA_20",
+    # "SMA_50",
+    "EMA_20",
+    # "EMA_50",
+    "RSI",
+    # "MACD",
+    # "MACD_Signal",
+    "Bollinger_Upper",
+    "Bollinger_Lower",
+]
+graphing.GraphingUtils.plot_price_history(data_processor.data, list_of_columns)
