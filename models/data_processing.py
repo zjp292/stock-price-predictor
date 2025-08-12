@@ -67,3 +67,5 @@ class DataProcessing:
         upper_band = rolling_mean + (rolling_std * num_std_dev)
         lower_band = rolling_mean - (rolling_std * num_std_dev)
         return upper_band, lower_band
+    
+    

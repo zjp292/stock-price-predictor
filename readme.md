@@ -25,6 +25,10 @@ This project is a practice implementation to learn and demonstrate core concepts
     conda env create -f environment.yml
     conda activate stock-predictor
     ```
+    Note: If updating environmnet use the following command:
+    ```sh
+    conda env update --file environment.yml --prune
+    ```
 2. Set your Tiingo API key in a `.env` file:
     ```
     TIINGO_API_KEY=your_api_key_here

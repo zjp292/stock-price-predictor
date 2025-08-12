@@ -1,4 +1,5 @@
 from models.data_processing import DataProcessing
+from models.neural_models import LSTM
 from utils import graphing
 
 # get stock data (either csv or ticker)
@@ -27,4 +28,5 @@ list_of_columns = [
     "Bollinger_Upper",
     "Bollinger_Lower",
 ]
-graphing.GraphingUtils.plot_price_history(data_processor.data, list_of_columns)
+# graphing.GraphingUtils.plot_price_history(data_processor.data, list_of_columns)
+LSTM_model = LSTM(data_processor.data[list_of_columns])
