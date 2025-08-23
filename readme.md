@@ -22,9 +22,12 @@ This project is a practice implementation to learn and demonstrate core concepts
 
 1. Create and activate a conda environment, then install dependencies:
     ```sh
-    conda create -n stock-predictor python=3.11
+    conda env create -f environment.yml
     conda activate stock-predictor
-    pip install -r requirements.txt
+    ```
+    Note: If updating environmnet use the following command:
+    ```sh
+    conda env update --file environment.yml --prune
     ```
 2. Set your Tiingo API key in a `.env` file:
     ```
