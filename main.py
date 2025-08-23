@@ -1,4 +1,5 @@
 from models.data_processing import DataProcessing
+
 # from models.neural_models import LSTM
 from utils import graphing
 
@@ -13,18 +14,5 @@ from utils import graphing
 
 
 data_processor = DataProcessing("MSFT")
-print(data_processor.data.head())
 
-list_of_columns = [
-    "close",
-    "SMA_20",
-    # "SMA_50",
-    "EMA_20",
-    # "EMA_50",
-    "RSI",
-    # "MACD",
-    # "MACD_Signal",
-    "Bollinger_Upper",
-    "Bollinger_Lower",
-]
 graphing.GraphingUtils.plot_candlestick_chart(data_processor.data[-350:])

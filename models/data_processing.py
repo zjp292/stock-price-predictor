@@ -36,7 +36,9 @@ class DataProcessing:
             self.data["SMA_20"] = self.data["close"].rolling(window=20).mean()
             self.data["SMA_20"] = self.data["close"].rolling(window=50).mean()
             self.data["SMA_200"] = self.data["close"].rolling(window=200).mean()
-            self.data['Vol_EMA_22'] = self.data['volume'].ewm(span=22, adjust=False).mean()
+            self.data["Vol_EMA_22"] = (
+                self.data["volume"].ewm(span=22, adjust=False).mean()
+            )
 
             self.data["EMA_20"] = self.data["close"].ewm(span=20, adjust=False).mean()
             self.data["EMA_50"] = self.data["close"].ewm(span=50, adjust=False).mean()
@@ -72,5 +74,3 @@ class DataProcessing:
         upper_band = rolling_mean + (rolling_std * num_std_dev)
         lower_band = rolling_mean - (rolling_std * num_std_dev)
         return upper_band, lower_band
-    
-    
