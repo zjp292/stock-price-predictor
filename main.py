@@ -1,5 +1,5 @@
 from models.data_processing import DataProcessing
-from models.neural_models import LSTM
+# from models.neural_models import LSTM
 from utils import graphing
 
 # get stock data (either csv or ticker)
@@ -14,7 +14,6 @@ from utils import graphing
 
 data_processor = DataProcessing("MSFT")
 print(data_processor.data.head())
-# data_processor.process_data()
 
 list_of_columns = [
     "close",
@@ -28,5 +27,4 @@ list_of_columns = [
     "Bollinger_Upper",
     "Bollinger_Lower",
 ]
-# graphing.GraphingUtils.plot_price_history(data_processor.data, list_of_columns)
-LSTM_model = LSTM(data_processor.data[list_of_columns])
+graphing.GraphingUtils.plot_candlestick_chart(data_processor.data[-350:])

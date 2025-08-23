@@ -15,10 +15,10 @@ class DataProcessing:
         self.client = TiingoClient(config)
         self.data = None
 
-        self.fetch_data()
+        self.fetch_daily_data()
         self.add_tech_indicators()
 
-    def fetch_data(self, start_date="1990-01-01"):
+    def fetch_daily_data(self, start_date="1990-01-01"):
         if not os.path.isfile(f"{self.ticker}.csv"):
             print(f"Fetching data for {self.ticker}...")
             hist_data = self.client.get_dataframe(self.ticker, start_date)
@@ -28,11 +28,16 @@ class DataProcessing:
             print(f"Data for {self.ticker} already exists.")
 
         self.data = pd.read_csv(f"{self.ticker}.csv", index_col=0)
+        self.data.set_index(pd.to_datetime(self.data.index), inplace=True)
 
     def add_tech_indicators(self):
         if self.data is not None:
+            self.data["SMA_10"] = self.data["close"].rolling(window=10).mean()
             self.data["SMA_20"] = self.data["close"].rolling(window=20).mean()
-            self.data["SMA_50"] = self.data["close"].rolling(window=50).mean()
+            self.data["SMA_20"] = self.data["close"].rolling(window=50).mean()
+            self.data["SMA_200"] = self.data["close"].rolling(window=200).mean()
+            self.data['Vol_EMA_22'] = self.data['volume'].ewm(span=22, adjust=False).mean()
+
             self.data["EMA_20"] = self.data["close"].ewm(span=20, adjust=False).mean()
             self.data["EMA_50"] = self.data["close"].ewm(span=50, adjust=False).mean()
             self.data["RSI"] = self.compute_rsi(self.data["close"])
