@@ -32,10 +32,10 @@ class DataProcessing:
 
     def add_tech_indicators(self):
         if self.data is not None:
-            self.data["SMA_10"] = self.data["close"].rolling(window=10).mean()
-            self.data["SMA_20"] = self.data["close"].rolling(window=20).mean()
-            self.data["SMA_20"] = self.data["close"].rolling(window=50).mean()
-            self.data["SMA_200"] = self.data["close"].rolling(window=200).mean()
+            # self.data["SMA_10"] = self.data["close"].rolling(window=10).mean()
+            # self.data["SMA_20"] = self.data["close"].rolling(window=20).mean()
+            # self.data["SMA_50"] = self.data["close"].rolling(window=50).mean()
+            # self.data["SMA_200"] = self.data["close"].rolling(window=200).mean()
             self.data["Vol_EMA_22"] = (
                 self.data["volume"].ewm(span=22, adjust=False).mean()
             )
