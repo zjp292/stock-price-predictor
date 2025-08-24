@@ -1,59 +1,13 @@
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 import numpy as np
 
 
 class GraphingUtils:
     @staticmethod
-    # def plot_candlestick_chart(df):
-    #     buy_signals = np.where(df["RSI"] < 30, df["close"], np.nan)
-    #     sell_signals = np.where(df["RSI"] > 70, df["close"], np.nan)
-
-    #     addplots = [
-    #         mpf.make_addplot(
-    #             df["Vol_EMA_22"],
-    #             panel=1,
-    #             color="orange",
-    #             width=1.0,
-    #             ylabel="Volume EMA 22",
-    #         ),
-    #         mpf.make_addplot(
-    #             buy_signals,
-    #             type="scatter",
-    #             marker="^",
-    #             color="green",
-    #             markersize=100,
-    #         ),
-    #         mpf.make_addplot(
-    #             sell_signals,
-    #             type="scatter",
-    #             marker="v",
-    #             color="red",
-    #             markersize=100,
-    #         ),
-    #         mpf.make_addplot(
-    #             df["Bollinger_Upper"], color="grey", width=1.0, linestyle="--"
-    #         ),
-    #         mpf.make_addplot(
-    #             df["Bollinger_Lower"], color="grey", width=1.0, linestyle="--"
-    #         ),
-    #     ]
-    #     mpf.plot(
-    #         df,
-    #         type="candle",
-    #         style="charles",
-    #         title="Candlestick Chart",
-    #         ylabel="Price",
-    #         mav=(10, 20, 50, 200),
-    #         volume=True,
-    #         addplot=addplots,
-    #         returnfig=True,
-    #     )
-    #     plt.show()
-
-    @staticmethod
     def plot_candlestick_chart(df):
-        fig = go.Figure()
+        fig = make_subplots(rows=3, cols=1, shared_xaxes=True, vertical_spacing=0.02)
 
         fig.add_trace(
             go.Candlestick(
@@ -63,8 +17,86 @@ class GraphingUtils:
                 low=df["low"],
                 close=df["close"],
                 name="Candlesticks",
-            )
+            ),
+            row=1,
+            col=1,
         )
+
+        if df["SMA_10"].notnull().any():
+            fig.add_trace(
+                go.Scatter(
+                    x=df.index,
+                    y=df["SMA_10"],
+                    mode="lines",
+                    name="SMA_10",
+                    line_color="purple",
+                ),
+                row=1,
+                col=1,
+            )
+
+        if df["SMA_20"].notnull().any():
+            fig.add_trace(
+                go.Scatter(
+                    x=df.index,
+                    y=df["SMA_20"],
+                    mode="lines",
+                    name="SMA_20",
+                    line_color="orange",
+                ),
+                row=1,
+                col=1,
+            )
+
+        if df["SMA_50"].notnull().any():
+            fig.add_trace(
+                go.Scatter(
+                    x=df.index,
+                    y=df["SMA_50"],
+                    mode="lines",
+                    name="SMA_50",
+                    line_color="green",
+                ),
+                row=1,
+                col=1,
+            )
+
+        if df["SMA_200"].notnull().any():
+            fig.add_trace(
+                go.Scatter(
+                    x=df.index,
+                    y=df["SMA_200"],
+                    mode="lines",
+                    name="SMA_200",
+                    line_color="red",
+                ),
+                row=1,
+                col=1,
+            )
+
+        volume_colors = np.where(df["close"] >= df["open"], "green", "red")
+
+        fig.add_trace(
+            go.Bar(
+                x=df.index, y=df["volume"], name="Volume", marker_color=volume_colors
+            ),
+            row=2,
+            col=1,
+        )
+
+        if df["Vol_EMA_22"].notnull().any():
+            fig.add_trace(
+                go.Scatter(
+                    x=df.index,
+                    y=df["Vol_EMA_22"],
+                    mode="lines",
+                    name="Vol_EMA_22",
+                ),
+                row=2,
+                col=1,
+            )
+        fig.update_yaxes(fixedrange=True)
+
         fig.show()
 
     @staticmethod

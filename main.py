@@ -14,5 +14,5 @@ from utils import graphing
 
 
 data_processor = DataProcessing("MSFT")
-
+print(data_processor.data.tail())
 graphing.GraphingUtils.plot_candlestick_chart(data_processor.data[-350:])
